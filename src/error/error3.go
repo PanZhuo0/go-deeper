@@ -1,7 +1,6 @@
 package error
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -32,14 +31,14 @@ func ReadConfig() ([]byte, error) {
 	return config, errors.WithMessage(err, "could not read config")
 }
 
-func main() {
-	_, err := ReadConfig()
-	if err != nil {
-		fmt.Printf("original error:%T %+v\n", errors.Cause(err), errors.Cause(err))
-		fmt.Printf("stack trace:\n%+v\n", err)
-		os.Exit(1)
-	}
-}
+// func main() {
+// 	_, err := ReadConfig()
+// 	if err != nil {
+// 		fmt.Printf("original error:%T %+v\n", errors.Cause(err), errors.Cause(err))
+// 		fmt.Printf("stack trace:\n%+v\n", err)
+// 		os.Exit(1)
+// 	}
+// }
 
 func Write(w io.Writer, buf []byte) error {
 	_, err := w.Write(buf)
