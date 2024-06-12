@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+
+option go_package = "demo/proto/book";
+
+import "book/price.proto";
+import "author/author.proto";
+import "google/protobuf/timestamp.proto";
+
+message Book{
+    string title =1;
+    // 引用price.proto
+    book.Price price =2;
+    author.Info author =3;
+    google.protobuf.Timestamp t =4;
+}

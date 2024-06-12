@@ -1,0 +1,18 @@
+syntax="proto3";
+
+option go_package="homework/";
+package pb;
+
+service HomeWork{
+    rpc Add(HomeWokrRequest)returns(HomeWorkResponse){}
+}
+
+message HomeWokrRequest{
+    int32 X =1;
+    int32 Y =2;
+}
+
+message HomeWorkResponse{
+    int32 Sum=1;
+}
+

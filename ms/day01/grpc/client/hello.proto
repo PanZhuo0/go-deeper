@@ -1,0 +1,27 @@
+// gRPC demo
+syntax="proto3"; //version
+
+
+// 文件所处的文件目录结构
+option go_package="hello/pb"; 
+
+// 文件中的package 写什么?
+package pb; //proto file module
+
+// define service
+service Greeter{
+    // 定义方法
+    rpc SayHello (HelloRequest)returns(HelloResponse){}
+}
+
+// define Message 
+// 类似于Go中的结构体
+message HelloRequest{
+    // 设置序号，减少传输数量，可以提高网络传输效率 | 便于后期扩展
+    string name =1 ;
+}
+
+// define message
+message HelloResponse{
+    string reply =1;
+}

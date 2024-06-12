@@ -1,0 +1,14 @@
+syntax="proto3";
+
+// proto package
+package book;
+
+// go package
+// option go_package = "github.com/Myname/demo/proto/book";
+option go_package = "demo/proto/book";
+
+message Price{
+    int64 marktet_price=1;
+    int64 sale_price=2;
+}
+

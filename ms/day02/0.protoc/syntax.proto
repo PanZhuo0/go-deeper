@@ -1,0 +1,76 @@
+syntax="proto3";
+
+import "google/protobuf/any.proto";
+
+// Package 可以不带，推荐带
+package test;
+
+message SearchRequest{
+    // scalar types
+    string query =1; // type  identifier id
+    // range of id = 1 ->2**29-1 ==536,870,911 Not allow:19000-19999(ReservedNumber)
+    int32 page_number=2;
+    int32 result_per_page=3;
+
+    repeated string ret=4;
+
+    // enum 先定义再使用
+    enum Corpus{
+        // 允许同枚举值
+        option allow_alias = true;
+        UNIVERSAL=0; // 枚举值
+        WEB=1;
+        IMAGES=2;
+        LOCAL=3;
+        NEWS=4;
+        PRODUCTS=5;
+        VIDEO=6;
+        MUSIC=6;
+        // 使用变长编码，不推荐使用负数，效率低
+    }
+
+    Corpus corpus = 5; //编号
+}
+
+message SearchResponse{
+    repeated string ret=1;
+    // eg reserve #200->300
+    reserved 200 to 300;
+    
+    // 可以在本消息中引用其他消息
+    SearchRequest.Corpus corpus=2;
+    Result result =3;
+}
+
+message Result{
+    string url=1;
+    string title=2;
+    repeated string snippets=3;
+}
+
+
+// any
+message ErrorStatus{
+    string message=1;
+    repeated google.protobuf.Any details=2;
+}
+
+// oneof
+message SampleMessage{
+    oneof test_onefof{
+        int32 age=5;
+        string name =4;
+        // SubMessage sub_message=9;
+    }
+}
+
+// Maps
+message AMap{
+    map<string,int32> map_1=4;
+}
+
+
+// service description
+service SearchService{
+    rpc Search(SearchRequest)returns(SearchResponse);
+}
