@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+// grpc.Error Demo
+option go_package = "./e";
+
+
+message ERequest{
+    string name =1;
+}
+
+message EResponse{
+    string reply =1;
+}
+
+service E{
+    rpc err(ERequest)returns(EResponse);
+}
+
+

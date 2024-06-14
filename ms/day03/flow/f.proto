@@ -1,0 +1,21 @@
+syntax="proto3";
+
+option go_package = "./flow";
+
+message HelloRequest{
+    string name =1;
+}
+
+message HelloResponse{
+    string return =1;
+}
+
+service flow_rpc{
+    // 服务端流式
+    rpc replies(HelloRequest)returns(stream HelloResponse);
+    // 客户端流式
+    rpc reqs(stream HelloRequest)returns(HelloResponse);
+    // 双向流
+    rpc bi(stream HelloRequest)returns(stream HelloResponse);
+}
+

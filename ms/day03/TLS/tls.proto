@@ -1,0 +1,15 @@
+syntax="proto3";
+
+option go_package="./tls";
+
+message TReq {
+    string name =1;
+}
+
+message TResp{
+    string reply=2;
+}
+
+service T{
+    rpc THello(TReq)returns(TResp);
+}

@@ -1,0 +1,15 @@
+syntax="proto3";
+
+option go_package="./i";
+
+message R {
+    string r=1;
+}
+
+message Re{
+    string re=1;
+}
+
+service I{
+    rpc Interc(R)returns(Re);
+}
