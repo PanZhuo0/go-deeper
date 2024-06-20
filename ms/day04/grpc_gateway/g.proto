@@ -1,0 +1,22 @@
+syntax="proto3";
+
+option go_package = "./gateway";
+
+service Gate{
+    rpc SayHello(GRequest)returns(GResponse){
+        // gateway
+        option(google.api.http)={
+            post:"/v1/echo"
+            // 标识不受路径模板约束，每个字段都会被映射到请求正文
+            body:"*"
+        };
+    };
+}
+
+message GRequest{
+    string name=1;
+}
+
+message GResponse{
+    string message=1;
+}

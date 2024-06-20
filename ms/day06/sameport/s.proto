@@ -1,0 +1,21 @@
+syntax="proto3";
+
+import "google/api/annotations.proto";
+
+option go_package = "./sameport";
+
+message Request{
+    string name =1;
+}
+
+message Response{
+    string reply=1;
+}
+
+service SameP{
+    rpc SP(Request)returns(Response){
+        option(google.api.http)={
+            get:"/sameport/test";
+        };
+    };
+}

@@ -1,0 +1,34 @@
+/* 
+Reference:
+    https://github.com/grpc-ecosystem/grpc-gateway
+
+介绍:
+    本例子用来复习grpc-gateway的基本使用方法
+
+    定义了一个简单的RPC sayhello方法，
+        使用grpc-gateway将其反向代理到 - GET uri:/review/test 路径下
+
+    在本例中只会进行HTTP请求的测试,
+    提供grpcServer端与grpc-gateway HTTP服务端,不提供grpc client端
+*/
+syntax="proto3";
+import "google/api/annotations.proto";
+
+option go_package = "./rev";
+
+message Request{
+    string name =1;
+}
+
+message Response{
+    string reply =1;
+}
+
+service Test{
+    rpc SayHello(Request)returns(Response){
+        // grpc-gateway
+        option(google.api.http)={
+            get:"/review/test"
+        };
+    };
+}
