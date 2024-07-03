@@ -1,0 +1,27 @@
+/* sf:server flow
+    服务端流demo
+        client 发送一个用户名
+        服务端返回多种语言的打招呼响应
+*/
+syntax="proto3";
+
+option go_package="./sf";
+
+message Request{
+    string Name =1;
+}
+
+message Response{
+    string Response =1;
+}
+
+service Greeter{
+    /* 
+        LotsOfReplies 方法
+            返回的时候使用流式返回,直到server服务结束,流才会关闭(控制权在server端)
+            stream 返回的结果都是Response Message 格式
+
+        底层会基于HTTP2建立连接,server端可以一直向client发送数据直到结束
+    */
+    rpc LotsOfReplies(Request) returns(stream Response);
+}

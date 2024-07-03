@@ -1,0 +1,21 @@
+syntax="proto3";
+
+/* client端的流
+典型的场景:
+    1.物联网情况下、某个物品持续给服务端发送定位/其他信息
+    2.一次可能发送几十M的信息给服务器、处理延迟过大、可以让客户端把一个大的请求分隔为多个小的请求 流化 */
+
+option go_package="./cf";
+
+message Request{
+    string name =1;
+}
+
+message Response{
+    string reply=1;
+}
+
+service CF{
+    /* client端 流式的请求 */
+    rpc Gretter(stream Request)returns(Response);
+}

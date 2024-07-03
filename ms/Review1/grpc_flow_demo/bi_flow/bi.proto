@@ -1,0 +1,16 @@
+syntax="proto3";
+
+/* 双向流 */
+option go_package="./bi";
+
+message Request{
+    string name =1;
+}
+
+message Response{
+    string reply=2;
+}
+
+service Gretter{
+    rpc bi_test(stream Request)returns(stream Response);
+}

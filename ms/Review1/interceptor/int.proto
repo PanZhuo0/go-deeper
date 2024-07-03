@@ -1,0 +1,15 @@
+syntax="proto3";
+
+option go_package= "./interceptor";
+
+message Request{
+    string name =1;
+}
+
+message Response{
+    string reply=1;
+}
+
+service Greeter{
+    rpc SayHello(Request)returns(Response);
+}

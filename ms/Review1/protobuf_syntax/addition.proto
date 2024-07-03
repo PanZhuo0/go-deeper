@@ -1,0 +1,73 @@
+syntax="proto3";
+
+import "D:/include/google/protobuf/wrapperd.proto";
+/* 只考虑了这些问题在.proto中如何定义,具体如何使用还需要在Go代码中实现 */
+/*  Wrappers
+
+存在的问题:
+    proto3中相比proto2去除了optional 关键字,
+    使得我们无法确定使用grpc时,是使用了默认值还是没有写入grpc自动将其设置为默认值
+    即:无法判断默认值是人为的还是机器的
+
+ 1.自定义
+   结构体(结构体中一个是对象本身，一个是判断是否赋值的bool 类型，一旦用户赋值,bool 将会变为true)
+    2.使用指针 Price *int
+        if Price == nil{
+            // 未赋值
+        }
+使用google/protobuf/wrappers.proto 中定义的wrap value
+*/
+
+message Wrap_test{
+    string title =1;
+    string author =2;
+    // int64 price =3;
+    google.protobuf.Int64Value price=3; 
+    google.protobuf.DoubleValue price2=4;
+    google.protobuf.StringValue memo=5;
+    // ...
+}
+
+/* FieldMask 
+
+存在的问题:
+    (统一接口的问题,有时我们会把CUD 合在一个接口上,这会导致rpc传递一些无用的信息)
+    服务的请求者，希望只需要发送一部分参数即可，不需要把整个请求体所有信息填写完整,减少负担
+    对于更新/删除这种请求，实际上只需要传递一部分信息即可(常见的update 是部分更新，而不是全量更新)
+    或者:service定义的服务中，部分请求只需要Request结构体中部分参数即可，但是grpc要求其填写Request结构体中所有的参数
+    这样会导致网络需要传输一些无用的信息,导致性能下降
+
+解决的方法:
+    google/protobuf/field_mask.proto 
+        底层通过掩码来实现确定rpc传递过程中请求结构体中那个是需要考虑的
+        类似子网掩码的作用，只需要考虑掩码标记的位置
+*/
+
+message FieldMask_Test{
+    string op=1;
+    Book book=2;
+}
+
+message Book{
+    string author=1;
+    string name=2;
+    google.protobuf.DoubleValue price=3 ;
+
+    // 需要更新的字段,这个字段专门用来记录这个Message 中那些字段在创建时那些字段被使用了
+    // 具体使用需要结合Go程序
+    google.protobuf.FieldMask update_mask=4;
+}
+
+/* 
+    Go--FieldMask
+
+    UpdateMask:pb.FieldMask{
+        Paths: []string{"price"} //只修改价格,如果存在层级的结构体 []string{"price","nested.a.b.c"}
+    }
+    Path []string: 被修改字段的路径(路径:因为结构体可以嵌套，所以是路径,而不是一个普通bool数组)
+
+
+    --server 端如何处理FieldMask?
+        Reference:
+            https://liwenzhou.com/posts/Go/oneof-wrappers-field_mask/
+*/

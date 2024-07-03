@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+/* 
+    Reference:
+        https://protobuf.dev/programming-guides/proto3/
+*/
+
+/* 消息结构体(可以是请求/响应)
+    可用的数据类型 Reference:https://protobuf.dev/programming-guides/proto3/#scalar
+        double 
+        float
+        int32
+        int64
+        uint32
+        uint64
+        sint32 (可变长编码的int32)
+        sint64 (可变长编码的int64)
+        fixed32 (固定4字节的int)
+        fixed64 (固定8字节的int)
+        sfixed32 总是4字节
+        sfixed64 总是8字节
+        bool
+        string
+        bytes
+
+*/
+
+/* 数据类型的默认值
+    string: ""
+    bytes: ''
+    bool:false
+    numeric:0
+    enums: First element
+    repeated 数组:默认为空
+*/
+
+/* 枚举
+    使用示例:
+enum Corpus {
+  CORPUS_UNSPECIFIED = 0;
+  CORPUS_UNIVERSAL = 1;
+  CORPUS_WEB = 2;
+  CORPUS_IMAGES = 3;
+  CORPUS_LOCAL = 4;
+  CORPUS_NEWS = 5;
+  CORPUS_PRODUCTS = 6;
+  CORPUS_VIDEO = 7;
+}
+
+枚举允许不同Constant 具有相同的值,需要在定义是加一个 option allow_alias = true
+
+enum EnumAllowingAlias {
+  option allow_alias = true;
+  EAA_UNSPECIFIED = 0;
+  EAA_STARTED = 1;
+  EAA_RUNNING = 1;
+  EAA_FINISHED = 2;
+}
+*/
+
+/* 结构体的内嵌以及结构体中引用另一个结构体
+1.允许结构体内嵌
+
+message SearchResponse {
+  message Result {
+    string url = 1;
+    string title = 2;
+    repeated string snippets = 3;
+  }
+  repeated Result results = 1;
+}
+
+2.允许结构体中引入另一个结构体
+
+message SearchResponse {
+  repeated Result results = 1;
+}
+
+message Result {
+  string url = 1;
+  string title = 2;
+  repeated string snippets = 3;
+}
+
+3.允许通过import 导入其他.proto 文件中的结构体
+
+import "old.proto";
+
+*/
+
+message ExampleRequest{
+    // numeric
+    int32  a =1;
+    int64 b =2;
+    float c =3;
+    float d =4;
+        // other numeric type...
+
+    // string and boolean
+    string e =5;
+    repeated string f  =6;
+    bool g =7;
+    // enumeration
+    Man m =8;
+}
+
+enum Man{
+    Young = 10;
+    Medium = 40;
+    Old = 60;
+}
+
+/* 
+    特殊的一些类型
+        reserved:表示保留这个field number 以备后用
+        repeated:数组 (允许重复,go 中将使用切片实现)
+        Any:(可以封装各种类型)
+            需要导入:
+                import "google/protobuf/any.proto";
+        Oneof:
+            If you have a message with many fields and where at most one field will be set at the same time, 
+            you can enforce this behavior and save memory by using the oneof feature.
+            对于只用一个值的字段，可以使用Oneof 节省内存
+            Reference:
+                https://protobuf.dev/programming-guides/proto3/#oneof
+        Maps:
+            If you want to create an associative map as part of your data definition,
+            protocol buffers provides a handy shortcut syntax:  
+                map<key_type, value_type> map_field = N;
+
+            Reference:
+                https://protobuf.dev/programming-guides/proto3/#maps
+*/
+message Special{
+    repeated google.protobuf.Any test_any = 1;
+    map<string,test_oneof> map_test =3 ;
+    oneof test_oneof =(
+        // test_oneof 只会是这下面的一种类型
+        string name= 1;
+        int32 age =2;
+        bool gender = 3;
+    )
+}
+/* 可能的命名冲突,包的使用
+    可以使用package foo.bar 类似的定义，在其他包引入,来区分
+    demo:
+        a.proto
+            package foo.bar;
+            message Open { ... }
+        b.proto
+            message Foo {
+                ...
+                foo.bar.Open open = 1;
+                ...
+            }
+    Reference:
+        https://protobuf.dev/programming-guides/proto3/#packages
+*/
+
+/* 服务的定义
+    Demo:
+
+    service SearchService {
+      rpc Search(SearchRequest) returns (SearchResponse);
+    }
+
+*/
+
+/* 结构体中类型与Json的映射关系
+    Reference:
+        https://protobuf.dev/programming-guides/proto3/#packages
+*/
+
+
+/* protoc的使用 
+    Reference:
+        https://protobuf.dev/programming-guides/proto3/#generating
+*/
