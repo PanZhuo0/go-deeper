@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package api.bubblelist.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "bubblelist/api/bubblelist/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.bubblelist.v1";
+
+service Todo {
+	rpc CreateTodo (CreateTodoRequest) returns (CreateTodoReply){
+		/* 基于grpc-gateway 实现提供HTTP服务: 需要提前了解grpc-gateway HTTP与GRPC的映射规则*/
+		/* 当然，别忘了import google的注解扩展.proto
+			import "google/api/annotations.proto"	
+		*/
+		option (google.api.http)={
+			post: "v1/todo", //改grpc将被映射为创造一个一个http服务(post 请求，请求路径为: 域名/v1/todo)
+			body: "*", //接收全部数据,映射到CreateTodoRequest中
+		};
+	};
+
+	rpc UpdateTodo (UpdateTodoRequest) returns (UpdateTodoReply){
+		option (google.api.http)={
+			put:"/v1/todo/{id}",
+			body:"*"
+		};
+	};
+
+	rpc DeleteTodo (DeleteTodoRequest) returns (DeleteTodoReply){
+		option (google.api.http)={
+			delete: "/v1/todo/{id}",
+		};
+	};
+
+
+	rpc GetTodo (GetTodoRequest) returns (GetTodoReply){
+		option (google.api.http)={
+			get:"/v1/todo/{id}",
+		};
+	};
+
+
+	rpc ListTodo (ListTodoRequest) returns (ListTodoReply){
+		option (google.api.http)={
+			get:"/v1/todos",
+		};
+	};
+
+}
+
+/* 这样只会提供GRPC服务，如何提供HTTP服务?	-> 使用注解,基于grpc-gateway */
+message todo{ //注意这里是小写的todo,和service Todo不同
+	int64 id=1;	
+	string title=2;
+	bool status=3;
+}
+
+message CreateTodoRequest {
+	string title =1;
+}
+
+message CreateTodoReply {
+	int64 id=1;
+	string title=2;
+	bool status=3;
+}
+
+message UpdateTodoRequest {
+	int64 id = 1;
+	string title =2;
+	bool status=3;
+}
+
+message UpdateTodoReply {}
+
+message DeleteTodoRequest {
+	int64 id = 1;
+}
+
+message DeleteTodoReply {}
+
+message GetTodoRequest {
+	int64 id =1;
+}
+
+message GetTodoReply {
+	int64 id =1;
+	string title=2;
+	bool status =3;
+}
+
+/* 后期可以增加分页列举功能 */
+message ListTodoRequest {}
+
+message ListTodoReply {
+	repeated todo todos = 1;
+}
