@@ -15,6 +15,7 @@ func NewGRPCServer(c *conf.Server, todo *service.TodoService, logger log.Logger)
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),
+			CustomMiddleWare(),
 		),
 	}
 	if c.Grpc.Network != "" {
