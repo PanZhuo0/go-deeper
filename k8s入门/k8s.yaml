@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+# 改为NodePort 节点端口类型服务
+  type: NodePort
+  selector:
+  # 使用app 指定对应的资源
+    app: nginx
+  ports:
+  - protocol: TCP
+  # 对外端口
+    port: 80 
+    # 容器内部端口
+    targetPort: 80
+    nodePort: 30080 # 需要在30000->32767之间

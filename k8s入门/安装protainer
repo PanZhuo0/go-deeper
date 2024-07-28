@@ -1,0 +1,7 @@
+; 1.去官网下载配置文件
+kubectl apply -n portainer -f protainer.yaml
+
+//-n 命名空间 用来对集群资源进行隔离和分组的机制
+kubectl get ns 查看命名空间
+
+kebectl get all -n portainer
