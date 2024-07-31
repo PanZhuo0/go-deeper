@@ -1,0 +1,67 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/gorilla/websocket"
+)
+
+func main() {
+	http.HandleFunc("/ws", handle)
+	http.ListenAndServe(":8080", nil)
+}
+
+var up = websocket.Upgrader{
+	HandshakeTimeout: time.Second * 3, //Websocket握手超时时间:3s
+	ReadBufferSize:   1e3,             //读缓冲区大小:1kB
+	WriteBufferSize:  1e3,             //写缓冲区大小:1kB
+}
+
+var conns []*websocket.Conn
+
+func handle(w http.ResponseWriter, r *http.Request) {
+	// 1.将连接变为websocket连接
+	conn, err := up.Upgrade(w, r, nil)
+	if err != nil {
+		// 如果升级失败,应该记录升级失败的日志
+		log.Println(err)
+	}
+	defer conn.Close()
+	// 2.将conn加入到conns组中
+	conns = append(conns, conn)
+	// 3. 监听该conn的写入，一旦有写入就将这些写入写入到其他conns中
+	for {
+		// 3.1 接收conn的写入
+		_, msgData, err := conn.ReadMessage() //GO 没有直接判断socket是否关闭的机制,如果read的结果是error:EOF就是socket已经关闭了
+		fmt.Printf("err:%#v\n", err)
+		e, ok := err.(*websocket.CloseError)
+		if ok && e.Code == 1006 {
+			// 连接已经关闭，应该结束handle这个socket了
+			return
+		}
+		if err != nil {
+			log.Println(err)
+		}
+		fmt.Println(len(conns))
+		// 3.2将conn的写入转发到其他连接到该聊天室的所有conn中
+		for i, c := range conns {
+			msg := fmt.Sprintf("From %v: Msg:%v", conn.RemoteAddr(), string(msgData)) //返回的数据belike: From 192.168.1.1 : Msg:你好啊,我是张三
+			err := c.WriteMessage(websocket.TextMessage, []byte(msg))
+			if err != nil {
+				// 如果写入数据时出错，记录日志,同时将该连接conn从conns数组中删除
+				log.Printf("写入到%v时出错,err:%v", c.RemoteAddr(), err)
+				c.NetConn().Close()
+				if i == len(conns)-1 {
+					conns = conns[:len(conns)-1] //去除尾部conn
+				} else {
+					conns = append(conns[:i], conns[i+1:]...) //在conns中删除这个conn
+				}
+				// 如果一个websocket 客户端结束了，那么就把这个连接从websocket中除去,
+				// 同时websocket有如果连接关闭，再去读取会报EOF错误,根据这个EOF错误，就可以结束服务端对其的服务,有EOF就关闭websocket
+			}
+		}
+	}
+}
