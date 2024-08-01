@@ -3,12 +3,15 @@ package main
 import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var db *gorm.DB
 
 func init() {
 	var err error
+	// var mysqlLogger logger.Interface
+	mysqlLogger := logger.Default.LogMode(logger.Info)
 	db, err = gorm.Open(mysql.Open(`root:123123@tcp(localhost:3006)/book`), &gorm.Config{
 		// SkipDefaultTransaction: true, //是否跳过默认事务?
 		// NamingStrategy: schema.NamingStrategy{
@@ -16,7 +19,7 @@ func init() {
 		// 	SingularTable: false,  //是否单数表名?
 		// 	NoLowerCase:   true,   //不要小写转换?
 		// }, //表名命名策略
-		// Logger: ,设置日志
+		Logger: mysqlLogger, //设置日志
 
 	})
 	if err != nil {
@@ -25,5 +28,5 @@ func init() {
 }
 
 func main() {
-	// db.AutoMigrate()
+	db.AutoMigrate()
 }
